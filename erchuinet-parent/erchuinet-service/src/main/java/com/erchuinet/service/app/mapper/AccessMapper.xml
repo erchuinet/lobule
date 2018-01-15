@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erchuinet.service.app.dao.AccessLogMapper">
+	<insert id="insertAccessLog" >
+	   INSERT into accesslogs(
+				funcname,
+				art,
+				loginuserid,
+				uniqueid,
+				request_data,
+				response_data,
+				created,
+				remote_addr,
+				server_addr,
+				request_time_float,
+				request_method,
+				remote_port,
+				server_port,
+				request_uri,
+				threadid
+				
+				) VALUES (
+				#{funcname,jdbcType=VARCHAR},
+				#{art,jdbcType=VARCHAR},
+				#{loginuserid,jdbcType=INTEGER},
+				#{uniqueid,jdbcType=VARCHAR},
+				#{request_data,jdbcType=VARCHAR},
+				#{response_data,jdbcType=VARCHAR},
+				sysdate(),
+				#{remote_addr,jdbcType=VARCHAR},
+				#{server_addr,jdbcType=VARCHAR},
+				#{request_time_float,jdbcType=VARCHAR},
+				#{request_method,jdbcType=VARCHAR},
+				#{remote_port,jdbcType=VARCHAR},
+				#{server_port,jdbcType=VARCHAR},
+				#{request_uri,jdbcType=VARCHAR},
+				#{threadid,jdbcType=INTEGER}
+				
+				
+				)
+	
+	</insert>
+	
+	
+</mapper>

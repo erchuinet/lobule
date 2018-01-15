@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erchuinet.service.app.dao.CompanyMapper">
+	<parameterMap type="java.util.Map" id="Param">
+		<parameter property="companyid" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="IN" />
+		<parameter property="userid" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="IN" />
+		<parameter property="star" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="entryid" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="gradeContent" jdbcType="VARCHAR"
+			javaType="java.lang.String" mode="IN" />
+
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+	</parameterMap>
+
+	<parameterMap type="java.util.Map" id="registerParam">
+
+		<parameter property="companyid" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="IN" />
+		<parameter property="userid" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="IN" />
+		<parameter property="star" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="entryid" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="gradeContent" jdbcType="VARCHAR"
+			javaType="java.lang.String" mode="IN" />
+
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+
+	</parameterMap>
+
+	<select id="queryCompanyInfo" resultType="com.erchuinet.vo.ResultMap">
+		SELECT
+		c.companyid,c.companyname,c.address,(SELECT count(1) from recruitment
+		r where r.companyid=c.companyid and r.del=0)
+		num,c.approve,c.logo,c.intro,
+		(SELECT avg(g.star) from grade g where
+		g.companyid=c.companyid) star
+
+		from company c INNER JOIN recruitment r
+		on c.companyid=r.companyid where
+		1=1 and
+		r.recruitmentid=#{recruitmentid,jdbcType=INTEGER}
+
+	</select>
+
+	<select id="queryCompanyRecruit" resultType="com.erchuinet.vo.ResultMap">
+	    <![CDATA[
+	         SELECT r.title,c.companyname,r.workaddress,r.ensure,r.wage,c.companyid,
+	     GROUP_CONCAT(CONCAT(DATE_FORMAT(w.starttime,'%Y-%m-%d'),'至',DATE_FORMAT(w.endtime,'%Y-%m-%d'))) workdate,
+	     ]]>
+		<choose>
+			<when test="lon==0 or lat == 0">
+				'定位中' distance
+			</when>
+			<otherwise>
+				ROUND(SQRT((r.longitude-#{lon,jdbcType=FLOAT})*(r.longitude-#{lon,jdbcType=FLOAT})+(r.latitude-#{lat,jdbcType=FLOAT})*(r.latitude-#{lat,jdbcType=FLOAT}))*111195/1000,1)
+				distance
+
+			</otherwise>
+		</choose>
+	      <![CDATA[
+	     FROM recruitment r 
+		INNER JOIN company c on c.companyid=r.companyid 
+		INNER JOIN worktime w on r.worktimeid=w.worktimeid
+ 		 WHERE r.del=0 and c.companyid=#{companyid,jdbcType=INTEGER}
+ 		 and r.recruitmentid!=#{recruitmentid,jdbcType=INTEGER} 
+	    ]]>
+
+	</select>
+	<!-- 评价 -->
+	<insert id="commentForCompany" statementType="CALLABLE"
+		parameterMap="Param">
+		 <![CDATA[
+           call pro_commemt_company(
+		  #{userid,mode=IN,jdbcType=INTEGER},
+		  #{companyid,mode=IN,jdbcType=INTEGER},
+		  #{star,mode=IN,jdbcType=INTEGER},
+		  sysdate(),
+		  #{entryid,mode=IN,jdbcType=INTEGER},
+		  #{gradeContent,mode=IN,jdbcType=VARCHAR},
+		  #{result,mode=OUT,jdbcType=INTEGER});
+		       ]]>
+	</insert>
+	<!-- 企业用户注册 -->
+	<select id="companyUserRegister" statementType="CALLABLE"
+		parameterMap="registerParam">
+		 <![CDATA[
+		  call pro_company_user_register(
+		  #{u_phone,mode=IN,jdbcType=VARCHAR}    
+		  #{u_pwd,mode=IN,jdbcType=VARCHAR},
+		  #{u_companyname,mode=IN,jdbcType=VARCHAR},
+		  #{u_registration,mode=IN,jdbcType=VARCHAR},
+		  #{result,mode=OUT,jdbcType=INTEGER}
+		  )
+		 
+		 ]]>
+
+	</select>
+
+	<select id="companyUserLogin" resultType="com.erchuinet.vo.ResultMap">
+		SELECT a.accountid,a.companyid,a.phone FROM companyaccount a INNER JOIN
+		company c
+		where a.state=0 and a.phone=#{phone,jdbcType=VARCHAR}
+
+	</select>
+	<update id="updateCompanyPassWord">
+		UPDATE companyaccount set pwd=#{pwd,jdbcType=VARCHAR} where
+		accountid=(SELECT accountid from company c where
+		c.companyid=#{companyid,jdbcType=INTEGER})
+
+	</update>
+	<select id="checkPhone" resultType="int">
+		select count(1) from companyaccount where phone=#{phone,jdbcType=VARCHAR}
+
+	</select>
+	<update id="updateLoginPhone">
+		UPDATE companyaccount set phone=#{phone,jdbcType=VARCHAR} where
+		accountid=(SELECT accountid from company c where
+		c.companyid=#{companyid,jdbcType=INTEGER})
+	</update>
+
+</mapper>

@@ -1,0 +1,57 @@
+{
+    "status": 200,
+    "data": {
+        "list": [{
+                "id": 1,
+                "name": "张三",
+                "tel": 15639854832,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 2
+            },
+            {
+                "id": 2,
+                "name": "李四",
+                "tel": 15639854832,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 2
+            },
+            {
+                "id": 3,
+                "name": "黄蓉",
+                "tel": 13639854831,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 0
+            },
+            {
+                "id": 4,
+                "name": "赵云",
+                "tel": 15639858364,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 1
+            },
+            {
+                "id": 5,
+                "name": "张飞",
+                "tel": 15639854832,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 1
+            },
+            {
+                "id": 6,
+                "name": "建宁公主",
+                "tel": 15639854832,
+                "status": 1,
+                "avatar": "./images/upload.jpg",
+                "sex": 0
+            }
+        ],
+        "title": "测试数据"
+    },
+    "pages": 3,
+    "total": 6
+}

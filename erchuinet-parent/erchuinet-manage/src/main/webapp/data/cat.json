@@ -1,0 +1,81 @@
+{
+    "status": 200,
+    "data": {
+        "list": [{
+                "id": 1,
+                "switch": 1,
+                "order": 1,
+                "pid": 0,
+                "level": 0,
+                "title": "内容管理"
+            },
+            {
+                "id": 2,
+                "switch": 0,
+                "order": 2,
+                "pid": 1,
+                "level": 1,
+                "title": "文章管理"
+            },
+            {
+                "id": 3,
+                "switch": 0,
+                "order": 2,
+                "pid": 2,
+                "level": 2,
+                "title": "文章列表"
+            },
+            {
+                "id": 4,
+                "switch": 0,
+                "order": 2,
+                "pid": 2,
+                "level": 2,
+                "title": "文章分类"
+            },
+            {
+                "id": 5,
+                "switch": 0,
+                "order": 2,
+                "pid": 2,
+                "level": 2,
+                "title": "标签管理"
+            },
+            {
+                "id": 6,
+                "switch": 0,
+                "order": 2,
+                "pid": 0,
+                "level": 0,
+                "title": "产品管理"
+            },
+            {
+                "id": 7,
+                "switch": 0,
+                "order": 2,
+                "pid": 6,
+                "level": 1,
+                "title": "产品列表"
+            },
+            {
+                "id": 8,
+                "switch": 0,
+                "order": 2,
+                "pid": 6,
+                "level": 1,
+                "title": "产品分类"
+            },
+            {
+                "id": 9,
+                "switch": 0,
+                "order": 2,
+                "pid": 6,
+                "level": 1,
+                "title": "品牌管理"
+            }
+        ],
+        "title": "测试数据"
+    },
+    "pages": 8,
+    "total": 9
+}

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erchuinet.service.app.dao.WalletMapper">
+
+
+	<select id="viewWalletBlance" resultType="com.erchuinet.vo.ResultMap">
+		SELECT u.walletid,u.userid,u.balance from userwallet u where
+		u.userid=#{userid,jdbcType=INTEGER} and u.state=0
+
+	</select>
+
+	<select id="queryWalletIncomeOrWithdrawDepositList" resultType="com.erchuinet.vo.ResultMap">
+		SELECT
+		u.recordid,u.userid,u.mode,u.amount,DATE_FORMAT(u.createdate,'%Y-%m-%d')
+		createdate,u.serialnumber,u.withdraw,u.withdrawaccount,cc.companyid,
+		cc.companyname
+		from userwalletrecord u INNER JOIN companywalletrecord c on
+		u.serialnumber=c.serialnumber
+		LEFT JOIN company cc on cc.companyid=c.companyid
+		where u.mode=#{mode,jdbcType=INTEGER} and
+		u.userid=#{userid,jdbcType=INTEGER}
+	</select>
+
+	<update id="settingPaymentCode">
+		UPDATE userwallet u SET u.securitycode=#{securitycode,jdbcType=VARCHAR}
+		where u.userid=#{userid,jdbcType=INTEGER}
+	</update>
+
+	<update id="bindingAlipayOrWebchat">
+		UPDATE userwallet u SET
+		<if test="alipay!=null and alipay!=''">
+			u.alipay=#{alipay,jdbcType=VARCHAR},
+		</if>
+		<if test="webchat!=null and webchat!=''">
+			u.webchat=#{webchat,jdbcType=VARCHAR}
+		</if>
+
+		where u.userid=#{userid,jdbcType=INTEGER}
+
+	</update>
+
+	<select id="viewCompanyWalletBlance" resultType="com.erchuinet.vo.ResultMap">
+		SELECT
+		c.walletid,c.companyid,c.balance,c.securitycode,c.freezemoney,c.creditmoney,c.surplusmoney
+		FROM companywallet c where c.companyid=#{companyid,jdbcType=INTEGER}
+		and c.state=0
+	</select>
+	<update id="updateCompanySecurityCode" parameterType="map">
+
+		UPDATE companywallet SET securitycode=#{securitycode,jdbcType=VARCHAR} where
+		companyid=#{companyid,jdbcType=INTEGER}
+
+	</update>
+</mapper>

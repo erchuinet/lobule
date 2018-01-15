@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:task="http://www.springframework.org/schema/task"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans  
+  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd  
+  http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.2.xsd  
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd  
+  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd  
+  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd"> 
+
+
+    <!-- 要调用的工作类 -->
+    <bean id="quartzJob" class="com.mine.app.common.task.ToTimer"></bean>
+    <!-- 定义调用对象和调用对象的方法 -->
+    <bean id="jobtask"
+        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 调用的类 -->
+        <property name="targetObject">
+            <ref bean="quartzJob" />
+        </property>
+        <!-- 调用类中的方法 -->
+        <property name="targetMethod">
+            <value>work</value>
+        </property>
+    </bean>
+    <!-- 定义触发时间 -->
+    <bean id="doTime"
+        class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="jobtask" />
+        </property>
+        <!-- cron表达式 -->
+<!--         <property name="cronExpression"> -->
+<!--             <value>10,15,20,25,30,35,40,45,50,55 * * * * ?</value> -->
+<!--         </property> -->
+        
+        <property name="cronExpression" value="*/59 * * * * ?"/><!-- 每隔1秒钟触发一次 --> 
+    </bean>
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  -->
+    <bean id="startQuertz" lazy-init="false" autowire="no"
+        class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="doTime" />
+            </list>
+        </property>
+    </bean>
+    
+    
+    <!-- task 定时 -->
+    <task:scheduled-tasks> 
+    <!-- 这里表示的是每隔五秒执行一次 -->
+    <task:scheduled ref="TestTask" method="show" cron="*/5 * * * * ?" /> 
+    <task:scheduled ref="TestTask" method="print" cron="*/10 * * * * ?"/> 
+    <task:executor id="executor" pool-size="5" />
+    <!--配置线程池-->
+    <task:scheduler id="scheduler" pool-size="10" />
+    <task:annotation-driven executor="executor" scheduler="scheduler" />
+    
+  </task:scheduled-tasks> 
+ 
+  <!-- 自动扫描的包名 -->
+  <context:component-scan base-package="com.mine.app.common.task" /> 
+    
+</beans>
