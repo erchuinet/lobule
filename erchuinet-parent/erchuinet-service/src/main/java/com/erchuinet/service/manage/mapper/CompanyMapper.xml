@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.erchuinet.service.manage.dao。CompanyDao">
+	<select id="companylist" parameterType="com.erchuinet.vo.PageParam" resultType="com.erchuinet.vo.CompanyVo">
+		SELECT
+			C.COMPANYID,
+			C.COMPANYNAME,
+			C.REGISTERADDRESS,
+			C.COMPANYCONTACT,
+			C.COMPANYTEL,
+			C.PERSONS,
+			C.STATE,
+			C.SUGGESTION,
+			C.BUSINESSSCOPE,
+			C.BUSINESSLICENSE,
+			C.ESTABLISH,
+			C.CREATEUSER,
+			C.CREATETIME,
+			C.UPDATEUSER,
+			C.UPDATETIME,
+			C.DEL
+		FROM COMPANY C
+		
+		WHERE C.DEL = '0'
+		<if test="t.search!=null and t.search!=''">
+		  and 
+		  (c.COMPANYNAME LIKE CONCAT('%',#{t.search, jdbcType=VARCHAR}, '%') 
+		    or  C.REGISTERADDRESS LIKE CONCAT('%',#{t.search, jdbcType=VARCHAR}, '%')
+		    or C.COMPANYCONTACT LIKE CONCAT('%',#{t.search, jdbcType=VARCHAR}, '%') 
+		    or C.COMPANYTEL LIKE CONCAT('%',#{t.search, jdbcType=VARCHAR}, '%')
+		   )
+		</if>
+		ORDER BY C.UPDATETIME DESC
+ 		LIMIT #{page}, #{rows}
+	</select>
+	
+	<select id="getCompantCount" resultType="java.lang.Integer" parameterType="com.erchuinet.vo.PageParam">
+		SELECT
+			COUNT(C.COMPANYID)
+		FROM
+			COMPANY C
+		
+		WHERE C.DEL = '0'
+	</select>
+	
+	
+</mapper>

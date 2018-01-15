@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erchuinet.service.app.dao.UserMapper">
+
+	<parameterMap type="java.util.Map" id="Param">
+
+		<parameter property="phone" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="pwd" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="gender" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="nickname" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="figureurl" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="weixinid" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="qqid" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+
+	</parameterMap>
+
+
+
+
+
+	<parameterMap type="java.util.Map" id="settingParam">
+		<parameter property="userid" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="area" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="industry" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="fond" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+	</parameterMap>
+
+	<parameterMap type="java.util.Map" id="Params">
+		<parameter property="phone" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="userid" jdbcType="INTEGER" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+	</parameterMap>
+
+	<!-- 用户注册 -->
+
+	<select id="userRegister" statementType="CALLABLE" parameterMap="Param">
+	   <![CDATA[
+	     call pro_user_register(
+             #{phone,mode=IN,jdbcType=VARCHAR},
+             #{pwd,mode=IN,jdbcType=VARCHAR},
+             #{result,mode=OUT,jdbcType=INTEGER}
+             
+             );
+	   
+	   ]]>
+	</select>
+
+
+	<update id="completeUserInfo" parameterType="map">
+		update users
+		set
+		<if test="photo!=null and photo!=''">
+			photo=#{photo,jdbcType=VARCHAR},
+		</if>
+		<if test="name!=null and name!=''">
+			name=#{name,jdbcType=VARCHAR},
+		</if>
+		<if test="gender!=null and gender!=''">
+			gender=#{gender,jdbcType=VARCHAR},
+		</if>
+
+		<if test="city!=null and city!=''">
+			city=#{city,jdbcType=VARCHAR},
+		</if>
+		<if test="birthday!=null and birthday!=''">
+			birthday=#{birthday,jdbcType=VARCHAR},
+		</if>
+		<if test="height!=null and height!=''">
+			height=#{height,jdbcType=VARCHAR},
+		</if>
+		<if test="weight!=null and weight!=''">
+			weight=#{weight,jdbcType=VARCHAR},
+		</if>
+		<if test="educator!=null and educator!=''">
+			educator=#{educator,jdbcType=VARCHAR},
+		</if>
+		<!-- <if test=""> phone=? </if> -->
+		<if test="email!=null and email!=''">
+			email=#{email,jdbcType=VARCHAR},
+		</if>
+		<if test="qqcode!=null and qqcode!=''">
+			qqcode=#{qqcode,jdbcType=VARCHAR},
+		</if>
+		<if test="worktype!=null and worktype!=''">
+			worktype=#{worktype,jdbcType=VARCHAR},
+		</if>
+		<if test="worktime!=null and worktime!=''">
+			worktime=#{worktime,jdbcType=VARCHAR},
+		</if>
+		<if test="fulltime!=null and fulltime!=''">
+			fulltime=#{fulltime,jdbcType=VARCHAR},
+		</if>
+		<if test="workday!=null and workday!=''">
+			workday=#{workday,jdbcType=VARCHAR},
+		</if>
+		<if test="introduce!=null and introduce!=null">
+			introduce=#{introduce,jdbcType=VARCHAR},
+		</if>
+		<if test="card!=null and card!=''">
+			card=#{card,jdbcType=VARCHAR},
+		</if>
+		<if test="cardphoto!=null and cardphoto!=''">
+			cardphoto=#{cardphoto,jdbcType=VARCHAR},
+		</if>
+		<if test="approve!=null and approve!=''">
+			approve=#{approve,jdbcType=VARCHAR},
+		</if>
+
+		<if test="photo1!=null and photo1!=''">
+			photo1=#{photo1,jdbcType=VARCHAR},
+		</if>
+		<if test="photo2!=null and photo2!=''">
+			photo2=#{photo2,jdbcType=VARCHAR},
+		</if>
+		<if test="photo3!=null and photo3!=''">
+			photo3=#{photo3,jdbcType=VARCHAR},
+		</if>
+		<if test="photo4!=null and photo4!=''">
+			photo4=#{photo4,jdbcType=VARCHAR},
+		</if>
+		<if test="photo5!=null and photo5!=''">
+			photo5=#{photo5,jdbcType=VARCHAR},
+		</if>
+		<if test="nickname!=null and nickname!=''">
+			nickname =#{nickname,jdbcType=VARCHAR}
+		</if>
+		where userid=#{userid,jdbcType=INTEGER}
+
+	</update>
+
+	<select id="findUserIsExist" resultType="int">
+		SELECT count(1) from useraccount ua INNER JOIN users u on
+		ua.accountid=u.accountid where ua.phone=#{phone}
+	</select>
+
+	<select id="loginByPwd" resultType="com.erchuinet.vo.ResultMap">
+		SELECT u.userid,
+		u.photo,u.name,u.gender,u.city,u.height,u.weight,u.educator,u.phone,u.email,u.qqcode,u.introduce,u.approve,ua.state,ua.tokenNum,ua.state
+		from useraccount ua,users u WHERE ua.accountid=u.accountid AND
+		ua.phone=#{phone,jdbcType=INTEGER}
+		<if test="pwd!=null and pwd!=''">
+			AND ua.pwd=#{pwd,jdbcType=INTEGER}
+		</if>
+	</select>
+
+	<update id="saveUserPwd">
+		update useraccount set pwd = #{pwd}
+		where phone = #{phone}
+	</update>
+
+
+
+	<select id="recruitSetting" statementType="CALLABLE"
+		parameterMap="settingParam">
+		call pro_user_recruitment(
+		#{userid,jdbcType=INTEGER},
+		#{area,jdbcType=VARCHAR},
+		#{industry,jdbcType=VARCHAR},
+		#{fond,jdbcType=VARCHAR}
+
+		);
+
+	</select>
+
+
+	<select id="myRecruitList" resultType="com.erchuinet.vo.ResultMap">
+	  	 <![CDATA[
+	    SELECT r.title,c.companyname,r.workaddress,r.ensure,r.wage,
+	    IF(w.endtime is null, DATE_FORMAT(w.starttime,'%m月%d日'),CONCAT(DATE_FORMAT(w.starttime,'%m月%d日'),'至',DATE_FORMAT(w.endtime,'%m月%d日'))) workdate,
+	    e.recruitmentid,e.state,e.userid,
+	    c.companyid,
+	    (SELECT GROUP_CONCAT(s.skillname) from skills s where FIND_IN_SET(s.skillid,r.skill)) skill,
+        (SELECT GROUP_CONCAT(h.hobby) from hobby h where FIND_IN_SET (h.hobbyid,r.hobby)) hobby,
+        (select districtname from district d where d.districtid=r.district and d.state=0) districtname,
+	    ]]>
+		<choose>
+			<when test="lon==0 or lat == 0">
+				'定位中' distance
+			</when>
+			<otherwise>
+				ROUND(SQRT((r.longitude-#{lon,jdbcType=FLOAT})*(r.longitude-#{lon,jdbcType=FLOAT})+(r.latitude-#{lat,jdbcType=FLOAT})*(r.latitude-#{lat,jdbcType=FLOAT}))*111195/1000,1)
+				distance
+
+			</otherwise>
+		</choose>
+	   
+	    <![CDATA[
+	    FROM  entryform e INNER JOIN recruitment r on e.recruitmentid=r.recruitmentid 
+		INNER JOIN company c on c.companyid=r.companyid 
+		INNER JOIN worktime w on r.worktimeid=w.worktimeid
+		INNER JOIN position p on p.positionid=r.positionid 
+ 		 WHERE r.del=0 and e.userid=#{userid,jdbcType=INTEGER}  
+	    ]]>
+		<if test="state!=null and state!=''">
+			and e.state =#{state,jdbcType=INTEGER}
+		</if>
+	</select>
+
+
+
+	<select id="myCollectList" resultType="map">
+	     <![CDATA[
+	    SELECT r.title,cp.companyname,r.workaddress,r.ensure,r.wage,
+	    
+	    IF(w.endtime is null, DATE_FORMAT(w.starttime,'%m月%d日'),CONCAT(DATE_FORMAT(w.starttime,'%m月%d日'),'至',DATE_FORMAT(w.endtime,'%m月%d日'))) workdate,
+	    cp.companyid,c.state,c.userid,
+	    (SELECT GROUP_CONCAT(s.skillname) from skills s where FIND_IN_SET(s.skillid,r.skill)) skill,
+        (SELECT GROUP_CONCAT(h.hobby) from hobby h where FIND_IN_SET (h.hobbyid,r.hobby)) hobby,
+        (select districtname from district d where d.districtid=r.district and d.state=0) districtname,
+	    ]]>
+		<choose>
+			<when test="lon==0 or lat == 0">
+				'定位中' distance
+			</when>
+			<otherwise>
+				ROUND(SQRT((r.longitude-#{lon,jdbcType=FLOAT})*(r.longitude-#{lon,jdbcType=FLOAT})+(r.latitude-#{lat,jdbcType=FLOAT})*(r.latitude-#{lat,jdbcType=FLOAT}))*111195/1000,1)
+				distance
+
+			</otherwise>
+		</choose>
+	   
+	    <![CDATA[
+	     FROM collect c INNER JOIN recruitment r  on c.recruitmentid=r.recruitmentid 
+		INNER JOIN company cp on cp.companyid=r.companyid 
+		INNER JOIN worktime w on r.worktimeid=w.worktimeid
+		INNER JOIN position p on p.positionid=r.positionid 
+ 		 WHERE r.del=0 and c.userid=#{userid,jdbcType=INTEGER}  
+	    ]]>
+
+	</select>
+
+	<update id="updateUserPwd" parameterType="map">
+		UPDATE useraccount u SET u.pwd=#{pwd,jdbcType=VARCHAR} where
+		u.accountid=(SELECT accountid from users where
+		userid=#{userid,jdbcType=INTEGER})
+
+	</update>
+	<select id="checkPhoneExists" resultType="int">
+
+		select count(1) from useraccount where phone=#{phone,jdbcType=VARCHAR}
+
+	</select>
+
+	<select id="updateUserPhone" statementType="CALLABLE"
+		parameterMap="Params">
+		call pro_user_updatephone(
+		#{userid,mode=IN,jdbcType=INTEGER},
+		#{phone,mode=IN,jdbcType=VARCHAR},
+		#{result,mode=OUT,jdbcType=INTEGER}
+		)
+	</select>
+	<update id="forgetPwd">
+		UPDATE useraccount u SET u.pwd=#{pwd,jdbcType=VARCHAR} where
+		u.phone=#{phone,jdbcType=VARCHAR}
+	</update>
+
+	<select id="myCertificateList" resultType="com.erchuinet.vo.ResultMap">
+		SELECT
+		c.certificateid,
+		CASE WHEN c.paystate=0 THEN '未支付'
+		ELSE '已支付'
+		END paystate,DATE_FORMAT(c.createdate,'%Y-%m-%d') createdate,c.workdate,
+		r.title
+		FROM certificate c
+		INNER JOIN entryform e on e.entryid=c.entryid
+		INNER JOIN recruitment r on r.recruitmentid=e.recruitmentid
+		WHERE c.del=0 and c.userid=#{userid,jdbcType=INTEGER}
+
+	</select>
+
+	<select id="myCertificateDetail" resultType="com.erchuinet.vo.ResultMap">
+		SELECT
+		c.certificateid,c.descriptions,
+		c.photo1,c.photo2,c.photo3,c.photo4,c.photo5,c.photo6,c.photo7,c.photo8,c.photo9,
+		CASE WHEN c.paystate=0 THEN '未支付'
+		ELSE '已支付'
+		END paystate,DATE_FORMAT(c.createdate,'%Y-%m-%d')
+		createdate,workdate,DATE_FORMAT(c.checktime,'%Y-%m-%d'),c.serialnumber
+		FROM certificate c WHERE
+		c.certificateid=#{certificateid,jdbcType=INTEGER} and c.del=0
+
+	</select>
+
+	<select id="viewUserInfo" resultType="com.erchuinet.vo.ResultMap">
+	  <![CDATA[
+	   SELECT u.userid,u.phone,u.photo,u.photo1,u.photo2,u.photo3,u.photo4,u.photo5,u.birthday,u.educator,u.worktype,u.introduce,u.nickname,
+	 (SELECT GROUP_CONCAT(hh.hobby) from hobby hh where FIND_IN_SET(hh.hobbyid, (SELECT h.hobby FROM interest h where h.userid=u.userid))) hobby,
+	 (SELECT GROUP_CONCAT(s.skillname) FROM skills s WHERE FIND_IN_SET(s.skillid,(SELECT skill FROM skill s where s.userid=u.userid))) skill
+	 FROM users u 
+	 
+	   WHERE u.userid=#{userid,jdbcType=INTEGER}
+	  
+	  ]]>
+	</select>
+
+	<select id="hostQueryWordList" resultType="com.erchuinet.vo.ResultMap">
+	     <![CDATA[
+        select  p.positionid,p.jobname From position p 	     
+	    ]]>
+
+	</select>
+	<select id="queryUserInfo" resultType="com.erchuinet.vo.ResultMap">
+		SELECT u.accountid,u.userid,ua.phone,u.photo,ua.tokenNum tokennum,
+		u.photo1,u.photo2,u.photo3,u.photo4,u.photo5,u.gender,u.birthday,u.introduce,u.nickname,if(u.approve=1,'实名认证','未实名认证')
+		approve,u.card,u.educator,u.name
+		FROM useraccount ua INNER JOIN users u on ua.accountid=u.accountid where
+		ua.phone=#{phone} and ua.state=0
+
+
+
+	</select>
+	<select id="queryUserInfoById" resultType="com.erchuinet.vo.ResultMap">
+		SELECT u.accountid,u.userid,ua.phone,u.photo,ua.tokenNum tokennum,ua.state,
+		u.photo1,u.photo2,u.photo3,u.photo4,u.photo5,u.gender,u.birthday,u.introduce,u.nickname,if(u.approve=1,'实名认证','未实名认证')
+		approve,u.card,u.educator,u.name
+		FROM useraccount ua INNER JOIN users u on ua.accountid=u.accountid where
+		u.userid=#{userid}
+
+
+
+	</select>
+	<update id="saveToken">
+		UPDATE useraccount u SET u.tokenNum=#{tokennum,jdbcType=VARCHAR} where
+		u.accountid=(SELECT accountid from users where
+		userid=#{userid,jdbcType=INTEGER})
+	</update>
+	<!-- 登录注册 -->
+
+	<select id="threeUserLogin" statementType="CALLABLE"
+		parameterMap="Param">
+		call pro_threeUserLogin(
+		#{phone ,mode=IN,jdbcType=VARCHAR},
+		#{pwd ,mode=IN,jdbcType=VARCHAR},
+		#{gender ,mode=IN,jdbcType=VARCHAR},
+		#{nickname ,mode=IN,jdbcType=VARCHAR},
+		#{figureurl ,mode=IN,jdbcType=VARCHAR},
+		#{weixinid ,mode=IN,jdbcType=VARCHAR},
+		#{qqid,mode=IN,jdbcType=VARCHAR},
+		#{result,mode=OUT,jdbcType=INTEGER})
+
+	</select>
+
+
+	<select id="checkUser" resultType="com.erchuinet.vo.ResultMap">
+		SELECT u.userid,a.phone FROM useraccount a INNER JOIN users u on
+		a.accountid=u.accountid
+		where 1=1
+		<if test="qqid!=null and qqid!=''">
+			and a.qqid=#{qqid,jdbcType=VARCHAR}
+		</if>
+		<if test="weixinid!=null and weixinid!=''">
+			and a.weixinid=#{weixinid,jdbcType=VARCHAR}
+		</if>
+
+
+	</select>
+	<update id="bindingPhone">
+		UPDATE useraccount set
+		phone=#{phone,jdbcType=VARCHAR},pwd=#{pwd,jdbcType=VARCHAR} where 1=1
+		<if test="qqid!=null and qqid!=''">
+			and qqid=#{qqid,jdbcType=VARCHAR}
+		</if>
+		<if test="weixinid!=null and weixinid!=''">
+			and weixinid=#{weixinid,jdbcType=VARCHAR}
+		</if>
+	</update>
+</mapper>
