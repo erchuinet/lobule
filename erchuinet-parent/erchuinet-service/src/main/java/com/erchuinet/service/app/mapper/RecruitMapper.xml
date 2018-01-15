@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erchuinet.service.app.dao.RecruitMapper">
+
+	<parameterMap type="java.util.Map" id="Param">
+		<parameter property="recruitmentid" jdbcType="INTEGER"
+			javaType="java.lang.Integer" mode="IN" />
+		<parameter property="userid" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="IN" />
+		<parameter property="workdate" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="states" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+		<parameter property="content" jdbcType="VARCHAR" javaType="java.lang.String"
+			mode="IN" />
+
+		<parameter property="result" jdbcType="INTEGER" javaType="java.lang.Integer"
+			mode="OUT" />
+	</parameterMap>
+
+	<!-- 查询发布过招聘信息的城市 -->
+	<select id="getCity" resultType="com.erchuinet.vo.ResultMap">
+  <![CDATA[
+       SELECT  DISTINCT c.cityid,c.cityname,
+       (SELECT GROUP_CONCAT(CONCAT(d.districtid,';',d.districtname)) from district d where d.cityid=c.cityid) district
+		from  city c LEFT JOIN district d  on d.cityid=c.cityid and c.state=0
+         LEFT JOIN tradingarea t on t.districtid=d.districtid 
+		 where 1=1 
+		 
+		and  (c.cityid in(
+		        SELECT city from recruitment r where r.del=0
+		    )
+		and d.districtid in(
+		   SELECT district from recruitment r where r.del=0 
+		)
+       
+      )
+   ]]>
+	</select>
+
+	<select id="selectTrade" resultType="com.erchuinet.vo.ResultMap">
+		SELECT DISTINCT t.id,t.tradingareaname,t.districtid
+		from tradingarea t
+		where 1=1
+
+		and t.id in(
+		SELECT tradingarea from recruitment r where r.del=0
+		)
+
+	</select>
+
+	<select id="getPostition" resultType="com.erchuinet.vo.ResultMap">
+		SELECT positionid,jobname,parentid FROM position p where state=0
+		and EXISTS(
+		SELECT count(1) from recruitment r where r.del=0 and
+		p.positionid=r.positionid
+		)
+		ORDER BY parentid asc
+	</select>
+
+
+
+	<select id="queryRecruitList" resultType="map">
+	 <![CDATA[
+	    SELECT r.title,c.companyname,r.workaddress,r.ensure,CONCAT(r.wage,r.unit) wage,r.recruitmentid,
+	    IF(w.endtime is null, DATE_FORMAT(w.starttime,'%m月%d日'),CONCAT(DATE_FORMAT(w.starttime,'%m月%d日'),'至',DATE_FORMAT(w.endtime,'%m月%d日'))) workdate,
+	    
+	    c.companyid,
+	    (SELECT GROUP_CONCAT(s.skillname) from skills s where FIND_IN_SET(s.skillid,r.skill)) skill,
+        (SELECT GROUP_CONCAT(h.hobby) from hobby h where FIND_IN_SET (h.hobbyid,r.hobby)) hobby,
+        (select districtname from district d where d.districtid=r.district and d.state=0) districtname,
+	    ]]>
+		<choose>
+			<when
+				test="lon==null or lon =='0'.toString() or lat==null or lat == '0'.toString()">
+				'定位中' distance
+			</when>
+			<otherwise>
+				CONCAT(ROUND(SQRT((r.longitude-#{lon,jdbcType=FLOAT})*(r.longitude-#{lon,jdbcType=FLOAT})+(r.latitude-#{lat,jdbcType=FLOAT})*(r.latitude-#{lat,jdbcType=FLOAT}))*111195/1000,1),'千米')
+				distance
+
+			</otherwise>
+		</choose>
+	   
+	    <![CDATA[
+	    
+	     FROM recruitment r 
+		
+		INNER JOIN company c on c.companyid=r.companyid 
+		INNER JOIN worktime w on r.worktimeid=w.worktimeid
+		INNER JOIN position p on p.positionid=r.positionid 
+ 		 WHERE r.del=0 and r.state=0 
+			and 
+			(r.city =#{location,jdbcType=VARCHAR}  
+			 or r.district=#{location,jdbcType=VARCHAR}  
+			 or r.tradingarea =#{location,jdbcType=VARCHAR}  
+			)
+		]]>
+		<if test="positionid!=null and positionid!='0'.toString()">
+			<![CDATA[AND R.positionid =#{positionid,jdbcType=INTEGER} ]]>
+		</if>
+
+		<if test="ensure!=null and ensure!=''">
+			<![CDATA[ AND R.ensure =#{ensure,jdbcType=INTEGER} ]]>
+		</if>
+		<if test="payments!=null and payments!='0'.toString()">
+			<![CDATA[ AND r.payments =#{payments,jdbcType=INTEGER} ]]>
+
+		</if>
+		<if test="gender!=null and gender!='0'.toString()">
+			<![CDATA[  and r.gender=#{gender,jdbcType=INTEGER} ]]>
+
+		</if>
+		<if test="identitys!=null and identitys!='0'.toString()">
+			<![CDATA[   and r.identitys=#{identitys,jdbcType=INTEGER} ]]>
+
+		</if>
+
+		<if test="search!=null and search!='' and search!='0'.toString()">
+		 
+			<![CDATA[
+				and ( 
+				 r.title like CONCAT('%',#{search,jdbcType=VARCHAR},'%')
+				 or  r.workaddress like CONCAT('%',#{search,jdbcType=VARCHAR},'%')
+				 or  p.jobname like CONCAT('%',#{search,jdbcType=VARCHAR},'%') 
+				 or  r.worktype like CONCAT('%',#{search,jdbcType=VARCHAR},'%') 
+				 or  r.wage like CONCAT('%',#{search,jdbcType=VARCHAR},'%')  
+				  or r.skill like CONCAT('%',#{search,jdbcType=VARCHAR},'%')  
+				  or r.hobby like CONCAT('%',#{search,jdbcType=VARCHAR},'%')  
+				)
+		     ]]>
+		</if>
+		<!-- 距离 -->
+		<if test="lon!=0 and lat!=0">
+
+			<if test="order==1">
+				ORDER BY distance asc
+			</if>
+		</if>
+		<!-- 最新 -->
+		<if test="order==2">
+			order by createtime desc
+		</if>
+		<!-- 工资 -->
+		<if test="order==3">
+			order by r.wage desc
+		</if>
+		<!-- 默认推荐 -->
+		<if test="order==0">
+			order by r.wage desc
+		</if>
+		limit #{page,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+
+	<select id="findRecruitDetail" resultType="map">
+	 <![CDATA[
+	 SELECT r.title,
+	 CASE r.gender WHEN 1 THEN '男' WHEN 0  THEN '女' ELSE NULL END as gender,
+	 CAST((SELECT count(1) from entryform e  where e.recruitmentid=r.recruitmentid and r.del=0) AS CHAR) num,
+	 r.workaddress,
+	 r.linkman,
+	 r.linkemail,
+	 r.ensure,
+	 r.numbers, 
+	 r.jobdescription,
+	 r.longitude,
+	 r.latitude,
+	 r.wage,
+	 CASE r.payments WHEN 0 THEN '底薪+提成' WHEN 1 THEN '工资' ELSE NULL END as payments,
+	 CASE  r.worktype WHEN 0 THEN '短期' WHEN 1 THEN '长期' WHEN 2 THEN '周末' ELSE NULL END as worktype,
+	 DATE_FORMAT(r.createtime,'%Y-%m-%d %H:%i:%s') as createtime,
+     r.companyid,
+     r.recruitmentid,
+     r.timeframe,
+     DATE_FORMAT(w.starttime,'%Y-%m-%d') as starttime, 
+     DATE_FORMAT(w.endtime,'%Y-%m-%d') as endtime FROM recruitment r ,
+     worktime w where r.recruitmentid=w.recruitmentid 
+     AND r.recruitmentid=#{recruitmentid,jdbcType=INTEGER}
+	 ]]>
+	</select>
+	<insert id="favoriteSave">
+	 <![CDATA[
+	 insert into collect (recruitmentid, userid, collecttime,state)
+		values(#{recruitmentid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, SYSDATE(), 1)
+		 ]]>
+	</insert>
+	<!-- 首页广告 -->
+	<select id="getAdvertising" resultType="com.erchuinet.vo.ResultMap">
+		SELECT a.id,a.image,a.url,a.linktype,a.serial from advertising a where
+		a.disable=0
+	</select>
+	<!-- 举报 -->
+	<insert id="saveComplaint" parameterType="map">
+		INSERT into complaint (
+		content,
+		userid,
+		createdate,
+		<if test="sysmanageid!=null">
+			sysmanageid,
+			dealdate,
+
+		</if>
+		<if test="opinion!=null">
+			opinion
+		</if>
+		) VALUES(
+		#{content,jdbcType=VARCHAR},
+		#{userid,jdbcType=INTEGER},
+		sysdate(),
+		<if test="sysmanageid!=null">
+			#{sysmanageid,jdbcType=VARCHAR},
+			sysdate(),
+		</if>
+		<if test="opinion!=null">
+			#{opinion,jdbcType=VARCHAR}
+		</if>
+		)
+
+	</insert>
+	<!-- 报名 -->
+	<insert id="apply" statementType="CALLABLE" parameterMap="Param">
+		 <![CDATA[
+           call pro_user_apply(
+		  #{recruitmentid,mode=IN,jdbcType=INTEGER},
+		  #{userid,mode=IN,jdbcType=INTEGER},
+		  #{workdate,mode=IN,jdbcType=VARCHAR},
+			 #{states,mode=IN,jdbcType=VARCHAR},
+		  #{content,mode=IN,jdbcType=VARCHAR},
+		  #{result,mode=OUT,jdbcType=INTEGER});
+		   ]]>
+
+	</insert>
+
+	<insert id="publishPartTimeJob">
+         <![CDATA[
+	     INSERT into recruitment(
+				   companyid,
+ 				   typeid,
+   				   title,
+ 				   timeframe,
+  				   gender,
+   				   jobdescription,
+   				   workaddress,
+   				   telephone,
+   				   linkman,
+   				   linkemail,
+   				   
+   				   longitude,
+   				   latitude,
+   				   ensure,     
+   				   numbers,          
+   				   payments,   
+   				   wage,        
+   				   worktype,       
+   				   state,           
+   				   createtime,       
+   				   userid,  
+   				          
+   				   updatetime,        
+   				   ensuremoney,       
+   				   skill,            
+   				   hobby 
+				) VALUES (
+				#{companyid,jdbcType=INTEGER},
+				#{typeid,jdbcType=INTEGER},
+				#{title,jdbcType=VARCHAR},
+				#{timeframe,jdbcType=VARCHAR},
+				#{gender,jdbcType=INTEGER},
+				#{jobdescription,jdbcType=VARCHAR},
+				#{workaddress,jdbcType=VARCHAR},
+				#{telephone,jdbcType=VARCHAR},
+				#{linkman,jdbcType=VARCHAR},
+				#{linkemail,jdbcType=VARCHAR},
+				
+				#{longitude,jdbcType=VARCHAR},
+				#{latitude,jdbcType=VARCHAR},
+				#{ensure,jdbcType=INTEGER},
+				#{numbers,jdbcType=INTEGER},
+				#{payments,jdbcType=VARCHAR},
+				#{wage,jdbcType=VARCHAR},
+				#{worktype,jdbcType=INTEGER},
+				#{state,jdbcType=INTEGER},
+				sysdate(),
+				#{userid,jdbcType=INTEGER},
+				
+				sysdate(),
+				#{ensuremoney,jdbcType=INTEGER},
+				#{skill,jdbcType=VARCHAR},
+				#{hobby,jdbcType=VARCHAR}
+				)
+	 ]]>
+	</insert>
+
+
+	<select id="getCityList" resultType="com.erchuinet.vo.ResultMap">
+		SELECT DISTINCT c.cityid,c.cityname ,c.hot
+		from city c
+		where 1=1 and c.state=0
+		and c.cityid in(
+		SELECT city from recruitment r where r.del=0
+		)
+
+	</select>
+	<!-- 推荐求职者 -->
+	<select id="recommendUserList" resultType="com.erchuinet.vo.ResultMap">
+		SELECT DISTINCT u.userid,u.phone,u.phone,u.birthday,u.educator FROM users u
+		LEFT JOIN skill s on u.userid=s.userid
+		LEFT JOIN interest h on h.userid=u.userid
+		WHERE 1=1 and (FIND_IN_SET(s.skill,(SELECT r.skill FROM recruitment r where
+		r.del=0 and recruitmentid=#{recruitmentid,jdbcType=INTEGER}))
+		or FIND_IN_SET(h.hobby,(SELECT r.hobby FROM recruitment r where r.del=0
+		and recruitmentid=#{recruitmentid,jdbcType=INTEGER}))
+		)
+
+	</select>
+	<insert id="savePosition">
+		INSERT into position(
+		jobname,
+		createdate,
+		state,
+		del,
+		parentid
+		)VALUES(
+		#{jobname,jdbcType=VARCHAR},
+		sysdate(),
+		0,
+		0,
+		#{parentid,jdbcType=INTEGER}
+
+		)
+
+	</insert>
+	<select id="queryCompanyRecruitList" resultType="com.erchuinet.vo.ResultMap">
+		  <![CDATA[
+	    SELECT r.title,c.companyname,r.workaddress,r.ensure,r.wage,r.recruitmentid,
+	    IF(w.endtime is null, DATE_FORMAT(w.starttime,'%m月%d日'),CONCAT(DATE_FORMAT(w.starttime,'%m月%d日'),'至',DATE_FORMAT(w.endtime,'%m月%d日'))) workdate,
+	    
+	    c.companyid,
+	    (SELECT GROUP_CONCAT(s.skillname) from skills s where FIND_IN_SET(s.skillid,r.skill)) skill,
+        (SELECT GROUP_CONCAT(h.hobby) from hobby h where FIND_IN_SET (h.hobbyid,r.hobby)) hobby,
+        (select districtname from district d where d.districtid=r.district and d.state=0) districtname,
+	    ]]>
+		<choose>
+			<when test="lon=='0'.toString() or lat == '0'.toString()">
+				'定位中' distance
+			</when>
+			<otherwise>
+				ROUND(SQRT((r.longitude-#{lon,jdbcType=FLOAT})*(r.longitude-#{lon,jdbcType=FLOAT})+(r.latitude-#{lat,jdbcType=FLOAT})*(r.latitude-#{lat,jdbcType=FLOAT}))*111195/1000,1)
+				distance
+
+			</otherwise>
+		</choose>
+	   
+	    <![CDATA[
+	     FROM recruitment r 
+		INNER JOIN company c on c.companyid=r.companyid 
+		INNER JOIN worktime w on r.worktimeid=w.worktimeid
+		INNER JOIN position p on p.positionid=r.positionid 
+ 		 WHERE r.del=0 and r.state=0	and c.companyid=#{companyid,jdbcType=INTEGER}
+			
+		]]>
+
+
+	</select>
+	<delete id="deleteRecruit">
+		update recruitment r set r.state=1 where r.recruitmentid=${recruitmentid}
+
+	</delete>
+	<select id="queryJobProvedList" resultType="com.erchuinet.vo.ResultMap">
+		SELECT user.photo,
+		user.name,
+		CASE user.gender WHEN 1 THEN '男' WHEN 0 THEN '女' ELSE NULL END as gender,
+		DATE_FORMAT( entry.createdate,'%Y-%m-%d') as starttime,
+		entry.workdate,
+		entry.entryid
+		FROM users user,entryform entry,certificate cer where
+		entry.userid=user.userid AND
+		entry.recruitmentid=#{recruitmentid} AND entry.state=1
+		AND
+		certificate.userid=user.userid AND entry.entryid=certificate.entryid
+	</select>
+
+	<select id="checkFavorite" resultType="int">
+		SELECT count(1) from collect c where c.userid=#{userid} and
+		c.recruitmentid=#{recruitmentid} AND c.state=1
+	</select>
+</mapper>

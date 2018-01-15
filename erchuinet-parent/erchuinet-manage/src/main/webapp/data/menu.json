@@ -1,0 +1,165 @@
+{
+    "data": {
+        "list": [{
+                "id": 1,
+                "url": "",
+                "name": "内容管理",
+                "iconfont": "&#xe637;",
+                "sub": [{
+                    "id": 5,
+                    "url": "",
+                    "name": "内容管理",
+                    "iconfont": "&#xe637;",
+                    "sub": [{
+                            "id": 6,
+                            "url": "article.jsp",
+                            "name": "文章列表",
+                            "iconfont": "&#xe62a;"
+                        },
+                        {
+                            "id": 7,
+                            "url": "article-cat.jsp",
+                            "name": "文章分类",
+                            "iconfont": "&#xe635;"
+                        },
+                        {
+                            "id": 8,
+                            "url": "tag.jsp",
+                            "name": "标签管理",
+                            "iconfont": "&#xe632;"
+                        },
+                        {
+                            "id": 100,
+                            "url": "./css/font/demo_unicode.jsp",
+                            "name": "图标管理",
+                            "iconfont": "&#xe612;"
+                        }
+                    ]
+                }]
+            },
+            {
+                "id": 2,
+                "url": "",
+                "name": "产品管理",
+                "iconfont": "&#xe631;",
+                "sub": [{
+                        "id": 9,
+                        "url": "product.jsp",
+                        "name": "产品列表",
+                        "iconfont": "&#xe61a;",
+                        "sub": []
+                    },
+                    {
+                        "id": 10,
+                        "url": "brand.jsp",
+                        "name": "品牌管理",
+                        "iconfont": "&#xe60d;",
+                        "sub": []
+                    },
+                    {
+                        "id": 11,
+                        "url": "product-cat.jsp",
+                        "name": "分类管理",
+                        "iconfont": "&#xe610;",
+                        "sub": []
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "url": "",
+                "name": "会员管理",
+                "iconfont": "&#xe672;",
+                "sub": [{
+                    "id": 12,
+                    "url": "",
+                    "name": "会员管理",
+                    "iconfont": "&#xe672;",
+                    "sub": [{
+                            "id": 13,
+                            "url": "member.jsp",
+                            "name": "会员列表",
+                            "iconfont": "&#xe630;"
+                        },
+                        {
+                            "id": 14,
+                            "url": "member-level.jsp",
+                            "name": "会员等级",
+                            "iconfont": "&#xe60f;"
+                        },
+                        {
+                            "id": 15,
+                            "url": "member-statistics.jsp",
+                            "name": "会员统计",
+                            "iconfont": "&#xe74d;"
+                        }
+                    ]
+                }]
+            },
+            {
+                "id": 4,
+                "url": "",
+                "name": "网站设置",
+                "iconfont": "&#xe689;",
+                "sub": [{
+                        "id": 16,
+                        "url": "",
+                        "name": "系统管理",
+                        "iconfont": "&#xe646;",
+                        "sub": [{
+                                "id": 17,
+                                "url": "config.jsp",
+                                "name": "系统设置",
+                                "iconfont": "&#xe689;"
+                            },
+                            {
+                                "id": 18,
+                                "url": "sys-log.jsp",
+                                "name": "系统日志",
+                                "iconfont": "&#xe64a;"
+                            },
+                            {
+                                "id": 19,
+                                "url": "menu.jsp",
+                                "name": "栏目管理",
+                                "iconfont": "&#xe654;"
+                            },
+                            {
+                                "id": 20,
+                                "url": "shielding.jsp",
+                                "name": "屏蔽词",
+                                "iconfont": "&#xe629;"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 21,
+                        "url": "",
+                        "name": "权限管理",
+                        "iconfont": "&#xe609;",
+                        "sub": [{
+                                "id": 22,
+                                "url": "admin-role.jsp",
+                                "name": "角色管理",
+                                "iconfont": "&#xe608;"
+                            },
+                            {
+                                "id": 23,
+                                "url": "admin-permission.jsp",
+                                "name": "权限设置",
+                                "iconfont": "&#xe668;"
+                            },
+                            {
+                                "id": 24,
+                                "url": "admin.jsp",
+                                "name": "管理员",
+                                "iconfont": "&#xe672;"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "status": 200
+}
